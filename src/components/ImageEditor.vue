@@ -310,7 +310,7 @@ function uploadImgClick() {
 function uploadImg(imgData) {
   console.log("rev upload img event", imgData);
   //imgData  ArrayBuffer
-  const PACK_LEN = 500;
+  const PACK_LEN = 512;
   const BOX_SETTING_CMD_UPLOAD_BMP_START = 10;
   const BOX_SETTING_CMD_UPLOAD_BMP_DATA = 11;
 

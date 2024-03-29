@@ -6,6 +6,7 @@ import AlarmClock from "@/components/AlarmClock.vue";
 import Manual from "@/components/Manual.vue";
 import DeviceTimeClock from "@/components/DeviceTimeClock.vue";
 import DeviceBaseInfo from "@/components/DeviceBaseInfo.vue";
+import Ota from "@/components/Ota.vue";
 
 let connectedDevice = ref(null);
 let deviceTime = ref("-");
@@ -27,6 +28,7 @@ let alarmLoaded = ref(false);
 let alarmCfg = 0;
 let alarmMin = 0;
 let alarmHour = 0;
+
 let alarmDayWeek = 0;
 
 const BOX_SETTING_CMD_PING = 0
@@ -144,15 +146,17 @@ function uartRx() {
 
         deviceTime.value = "20" + year + "-" + zeroPad(month) + "-" + zeroPad(day) + " " + zeroPad(hour) + ":" + zeroPad(minute) + ":" + zeroPad(second) + " 星期" + dayWeek[week];
 
-        // bit 0 enable // bit 1 WADA mode 0 week 1 day // bit 2 af flag
+        // bit 0 enable // bit 1 day mode, 0 week mode // bit 2 af flag // bit 3 week single select mode
         alarmCfg = value.getUint8(7);
         alarmMin = value.getUint8(8);
         alarmHour = value.getUint8(9);
+
+        // if week mode bit 0->6 sunday ->sat, bit 7 mask
+        // if day mode day and day mask
         alarmDayWeek = value.getUint8(10);
         console.log("load device alarm alarmCfg:", alarmCfg, "alarmMin", alarmMin, "alarmHour", alarmHour, "alarmDayWeek", alarmDayWeek);
 
         alarmLoaded.value = true;
-
       }).catch(error => {
         console.error('read uart 错误:', error);
       })
@@ -223,6 +227,10 @@ function uartTx(data, callback) {
     <div style="margin-top: 12px;">
       <Manual/>
     </div>
+
+<!--    <div style="margin-top: 12px;" v-if="deviceConnected">-->
+<!--      <Ota />-->
+<!--    </div>-->
   </main>
 </template>
 
