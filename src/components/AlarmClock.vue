@@ -38,7 +38,8 @@ const everyWeekModel = defineModel('everyWeekModel', {default: false});
 const dateModel = defineModel('dateModel', {default: ""});
 const timeModel = defineModel('timeModel', {default: ""});
 const checkedWeeksModel = defineModel('checkedWeeksModel', {default: []});
-const weekSingleSelectType = ref("checkbox");
+const radioWeeksModel = defineModel('radioWeeksModel', {default: ""});
+const weekSingleSelectMode = ref(false);
 
 const uartTx = inject('uartTx');
 
@@ -47,7 +48,7 @@ onMounted(() => {
 
   alarmEnableModel.value = (props.alarmCfg & 0x01) === 1;
   weekModeModel.value = ((props.alarmCfg >> 1) & 0x01) === 1 ? "by-day" : 'by-week';
-  weekSingleSelectType.value = ((props.alarmCfg >> 3) & 0x01) === 1 ? "radio" : 'checkbox';
+  weekSingleSelectMode.value = ((props.alarmCfg >> 3) & 0x01) === 1;
 
   let loadMin = props.minAlarm & 0b01111111;
   let loadHour = props.hourAlarm & 0b01111111;
@@ -63,7 +64,11 @@ onMounted(() => {
     dateModel.value = year + "-" + zeroPad((month + 1), 10) + "-" + zeroPad(day, 10);
     if ((props.dayWeekAlarm & 0b10000000) > 0) {
       everyWeekModel.value = true;
-      checkedWeeksModel.value = ['0', '1', '2', '3', '4', '5', '6'];
+      if (weekSingleSelectMode.value) {
+        radioWeeksModel.value = "";
+      } else {
+        checkedWeeksModel.value = ['0', '1', '2', '3', '4', '5', '6'];
+      }
     } else {
       let i = 0;
       let arr = [];
@@ -75,7 +80,12 @@ onMounted(() => {
         loadDayWeek = loadDayWeek >> 1;
       }
 
-      checkedWeeksModel.value = arr;
+      if (weekSingleSelectMode.value) {
+        radioWeeksModel.value = arr.length > 0 ? arr[0] : "";
+      } else {
+        checkedWeeksModel.value = arr;
+      }
+
     }
   }
 
@@ -94,7 +104,15 @@ function setAlarmSubmit() {
 
   let resultDayWeek = 0;
   if (weekMode) {
-    let checkedWeeks = checkedWeeksModel.value;
+    let checkedWeeks = [];
+    if (weekSingleSelectMode.value) {
+      if (radioWeeksModel.value !== "") {
+        checkedWeeks.push(radioWeeksModel.value);
+      }
+    } else {
+      checkedWeeks = checkedWeeksModel.value;
+    }
+
     if (checkedWeeks.length === 0 && alarmEnable && !everyWeekModel.value) {
       alert("请选择星期");
       return
@@ -198,21 +216,38 @@ function bcd2hex(bcd) {
     <div v-if="weekModeModel==='by-week'">
       <label>星期</label>
       <label class="ml1">每周<input type="checkbox" v-model="everyWeekModel"></label>
-      <label class="ml1">日
-        <input :type="weekSingleSelectType" v-model="checkedWeeksModel" value="0" :disabled="everyWeekModel"></label>
-      <label class="ml1">一
-        <input :type="weekSingleSelectType" v-model="checkedWeeksModel" value="1" :disabled="everyWeekModel"></label>
-      <label class="ml1">二
-        <input :type="weekSingleSelectType" v-model="checkedWeeksModel" value="2" :disabled="everyWeekModel"></label>
-      <label class="ml1">三
-        <input :type="weekSingleSelectType" v-model="checkedWeeksModel" value="3" :disabled="everyWeekModel"></label>
-      <label class="ml1">四
-        <input :type="weekSingleSelectType" v-model="checkedWeeksModel" value="4" :disabled="everyWeekModel">
+
+      <label class="ml1" v-if="!weekSingleSelectMode">日
+        <input type="checkbox" v-model="checkedWeeksModel" value="0" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="!weekSingleSelectMode">一
+        <input type="checkbox" v-model="checkedWeeksModel" value="1" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="!weekSingleSelectMode">二
+        <input type="checkbox" v-model="checkedWeeksModel" value="2" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="!weekSingleSelectMode">三
+        <input type="checkbox" v-model="checkedWeeksModel" value="3" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="!weekSingleSelectMode">四
+        <input type="checkbox" v-model="checkedWeeksModel" value="4" :disabled="everyWeekModel">
       </label>
-      <label class="ml1">五
-        <input :type="weekSingleSelectType" v-model="checkedWeeksModel" value="5" :disabled="everyWeekModel"></label>
-      <label class="ml1">六
-        <input :type="weekSingleSelectType" v-model="checkedWeeksModel" value="6" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="!weekSingleSelectMode">五
+        <input type="checkbox" v-model="checkedWeeksModel" value="5" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="!weekSingleSelectMode">六
+        <input type="checkbox" v-model="checkedWeeksModel" value="6" :disabled="everyWeekModel"></label>
+
+      <label class="ml1" v-if="weekSingleSelectMode">日
+        <input type="radio" v-model="radioWeeksModel" value="0" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="weekSingleSelectMode">一
+        <input type="radio" v-model="radioWeeksModel" value="1" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="weekSingleSelectMode">二
+        <input type="radio" v-model="radioWeeksModel" value="2" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="weekSingleSelectMode">三
+        <input type="radio" v-model="radioWeeksModel" value="3" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="weekSingleSelectMode">四
+        <input type="radio" v-model="radioWeeksModel" value="4" :disabled="everyWeekModel">
+      </label>
+      <label class="ml1" v-if="weekSingleSelectMode">五
+        <input type="radio" v-model="radioWeeksModel" value="5" :disabled="everyWeekModel"></label>
+      <label class="ml1" v-if="weekSingleSelectMode">六
+        <input type="radio" v-model="radioWeeksModel" value="6" :disabled="everyWeekModel"></label>
     </div>
     <div v-if="weekModeModel==='by-day'">
       <label>每天
