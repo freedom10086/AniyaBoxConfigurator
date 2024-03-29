@@ -202,7 +202,7 @@ function uartTx(data, callback) {
   <main>
     <div v-if="!deviceConnected">
       <button @click="connectBluetooth">连接蓝牙</button>
-      <p>长按第三个按键开启蓝牙</p>
+      <p>长按按键开启蓝牙</p>
     </div>
     <div v-else>
       <button @click="disConnectBluetooth" style="margin-right: 5px;">断开蓝牙</button>

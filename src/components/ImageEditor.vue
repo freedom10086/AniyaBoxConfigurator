@@ -310,7 +310,7 @@ function uploadImgClick() {
 function uploadImg(imgData) {
   console.log("rev upload img event", imgData);
   //imgData  ArrayBuffer
-  const PACK_LEN = 512;
+  const PACK_LEN = 502;
   const BOX_SETTING_CMD_UPLOAD_BMP_START = 10;
   const BOX_SETTING_CMD_UPLOAD_BMP_DATA = 11;
 
@@ -510,20 +510,21 @@ function atkinsonDithering(image) {
         </div>
         <div class="row">
           <label for="inverse">取反:</label>
-          <input type="checkbox" id="inverse" name="inverse" v-model="inverseValueModel"/>
+          <input style="margin-left: 5px;" type="checkbox" id="inverse" name="inverse" v-model="inverseValueModel"/>
+        </div>
+
+        <div class="row">
+          <label style="font-weight: bold">处理:</label>
+          <label style="margin-left: 5px">无
+            <input type="radio" name="effect" value="0" v-model="effectModel"/></label>
+          <label style="margin-left: 8px">atkinson:
+            <input type="radio" name="effect" value="2" v-model="effectModel"/></label>
+          <label style="margin-left: 8px">floyd:
+            <input type="radio" name="effect" value="1" v-model="effectModel"/></label>
         </div>
         <div class="row" style="margin-top: 12px">
           <button @click="presetClick(1)">预设1</button>
           <button @click="presetClick(2)" style="margin-left: 8px;">预设2</button>
-        </div>
-        <div class="row">
-          <label style="font-weight: bold">处理:</label>
-          <label>无
-            <input type="radio" name="effect" value="0" v-model="effectModel"/></label>
-          <label style="margin-left: 5px">floydSteinberg:
-            <input type="radio" name="effect" value="1" v-model="effectModel"/></label>
-          <label style="margin-left: 5px">atkinsonDithering:
-            <input type="radio" name="effect" value="2" v-model="effectModel"/></label>
         </div>
       </div>
     </div>
